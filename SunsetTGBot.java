@@ -88,7 +88,7 @@ public class SunsetTGBot extends TelegramLongPollingBot {
             String city = getUserCity(chatId);
 
             if (text.equalsIgnoreCase("/start")) {
-                sendMsg(chatId, "Приветствую вас в 'Закатник'! Я здесь, чтобы помочь Вам насладиться закатами и предоставить актуальную погоду. Для начала введите /changecity.");
+                sendMsg(chatId, "Приветствую вас в 'Закатник'! Я здесь, чтобы помочь Вам насладиться закатами и предоставить актуальную погоду. Для получения всей нужной информации: /help");
             } else if (text.equalsIgnoreCase("/changecity")) {
                 sendMsg(chatId, "Пожалуйста, введите название вашего города:");
                 askingCity = true;
@@ -105,28 +105,29 @@ public class SunsetTGBot extends TelegramLongPollingBot {
                 if (isValidCity(text)) {
                     askingCity = false;
                     saveUserCity(chatId, text);
-                    sendMsg(chatId, "Отлично! Теперь мы будем оповещать Вас о великолепных закатах в городе '" + getUserCity(chatId) + "'");
+                    sendMsg(chatId, "Отлично! Теперь мы будем оповещать Вас о великолепных закатах в '" + getUserCity(chatId) + "'");
                 } else if (text.charAt(0) == '/') {
-                    sendMsg(chatId, "Пожалуйста, вводите город, а не команду.");
+                    sendMsg(chatId, "Пожалуйста, вводите город или поселок, а не команду.");
                 } else {
-                    sendMsg(chatId, "Извините, но я не могу найти город '" + text + "'. Пожалуйста, введите нужный город на русском языке.");
+                    sendMsg(chatId, "Извините, но я не могу найти '" + text + "'. Пожалуйста, введите нужный город|поселок на русском языке.");
                 }
+
             } else if (text.equalsIgnoreCase("/help")) {
-                sendMsg(chatId, "Добро пожаловать в 'Золотой час'! Я ваш персональный помощник для наблюдения за закатами.\n\n" +
+                sendMsg(chatId, "Добро пожаловать в 'Закатник'! Я ваш персональный помощник для наблюдения за закатами.\n\n" +
                         "Что я умею:\n" +
-                        "- /changecity: Позволяет вам выбрать город, чтобы я мог предоставлять информацию о закатах и погоде именно для вашего местоположения.\n" +
-                        "- /sunset: Информирую вас о сегодняшнем закате в выбранном городе, чтобы вы могли насладиться этим волшебным моментом.\n" +
-                        "- /weather: Предоставляю текущий прогноз погоды для вашего города, включая температуру, влажность, скорость ветра и другие параметры.\n\n" +
+                        "- /changecity: Позволяет вам выбрать город|поселок, чтобы я мог предоставлять информацию о закатах и погоде именно для вашего местоположения.\n" +
+                        "- /sunset: Информирую вас о сегодняшнем закате в выбранном месте жительсва, чтобы вы могли насладиться этим волшебным моментом.\n" +
+                        "- /weather: Предоставляю текущий прогноз погоды, включая температуру, влажность, скорость ветра и другие параметры.\n\n" +
                         "Я создан, чтобы помочь вам находить и наслаждаться закатами, где бы вы ни находились. С моей помощью вы всегда будете в курсе, когда приготовиться к великолепному зрелищу небесных красок.\n\n" +
                         "Если у вас возникнут вопросы или вам потребуется помощь, свяжитесь с автором бота: @jdjdjddjhddj\n" +
                         "Пусть каждый ваш вечер будет украшен великолепным закатом!");
             } else if (text.equalsIgnoreCase("/sunset")) {
                 if (city != null) getSunsetInfo(chatId, city);
-                else sendMsg(chatId, "Сначала введите город командой /changecity");
+                else sendMsg(chatId, "Сначала введите город|поселок командой /changecity");
 
             } else if (text.equalsIgnoreCase("/weather")) {
                 if (city != null) getWeather(chatId, city);
-                else sendMsg(chatId, "Сначала введите город командой /changecity");
+                else sendMsg(chatId, "Сначала введите город|поселок командой /changecity");
 
             } else {
                 sendMsg(chatId, "Для получения всех нужных команд пишите /help");
@@ -207,7 +208,7 @@ public class SunsetTGBot extends TelegramLongPollingBot {
             String cloudType = identifyCloudType(cloudDescription, temperature, humidity, windSpeed * 3.6);
             int sunsetChance = calculateSunsetChance(windSpeed, (int) humidity, clouds, cloudType);
 
-            sendMsg(chatId, "Прогноз погоды на время заката в городе " + city + ":\n" +
+            sendMsg(chatId, "Прогноз погоды на время заката в " + city + ":\n" +
                     "\nВремя заката: " + sunsetTime.format(DateTimeFormatter.ofPattern("HH:mm")) +
                     "\n" + cloudType +
                     "\nВлажность: " + humidity + "%" +
