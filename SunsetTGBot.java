@@ -9,6 +9,8 @@ import org.telegram.telegrambots.meta.TelegramBotsApi;
 import org.telegram.telegrambots.meta.api.methods.groupadministration.GetChat;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.*;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.updatesreceivers.DefaultBotSession;
 
@@ -23,6 +25,8 @@ import java.nio.charset.StandardCharsets;
 import java.time.*;
 import java.time.format.DateTimeFormatter;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 
 import org.sqlite.SQLiteDataSource;
@@ -87,50 +91,55 @@ public class SunsetTGBot extends TelegramLongPollingBot {
             String text = message.getText();
             String city = getUserCity(chatId);
 
+            SendMessage sendMessage = new SendMessage();
+            sendMessage.setChatId(chatId);
+            sendMessage.enableMarkdown(true);
+
             if (text.equalsIgnoreCase("/start")) {
-                sendMsg(chatId, "Приветствую вас в 'Закатник'! Я здесь, чтобы помочь Вам насладиться закатами и предоставить актуальную погоду. Для получения всей нужной информации: /help");
+                sendMsg(chatId, "Приветствую вас в '*_Закатник_*'! " +
+                        "Я здесь, чтобы помочь Вам насладиться закатами и предоставить актуальную погоду. Для получения всей нужной информации: */help*", false);
             } else if (text.equalsIgnoreCase("/changecity")) {
-                sendMsg(chatId, "Пожалуйста, введите название вашего города:");
+                sendMsg(chatId, "Пожалуйста, введите название вашего города:", false);
                 askingCity = true;
             } else if (text.startsWith("/broadcast") && text.length() > 16  && chatId == 1418333402) {
                 String broadcastMessage = text.substring(17);
                 broadcastMessage(broadcastMessage);
-                sendMsg(chatId, "Сообщение отправлено всем пользователям.");
+                sendMsg(chatId, "Сообщение отправлено всем пользователям.", false);
             } else if (text.equalsIgnoreCase("/clean") && chatId == 1418333402) {
                 clearUserCities();
-                sendMsg(chatId, "Очищенно.");
+                sendMsg(chatId, "Очищенно.", false);
             } else if (text.equalsIgnoreCase("/stats") && chatId == 1418333402) {
                 getStats(chatId);
             } else if (askingCity) {
                 if (isValidCity(text)) {
                     askingCity = false;
                     saveUserCity(chatId, text);
-                    sendMsg(chatId, "Отлично! Теперь мы будем оповещать Вас о великолепных закатах в '" + getUserCity(chatId) + "'");
+                    sendMsg(chatId, "Отлично! Теперь мы будем оповещать Вас о великолепных закатах в '_" + getUserCity(chatId) + "_'", false);
                 } else if (text.charAt(0) == '/') {
-                    sendMsg(chatId, "Пожалуйста, вводите город или поселок, а не команду.");
+                    sendMsg(chatId, "Пожалуйста, вводите город или поселок, а не команду.", false);
                 } else {
-                    sendMsg(chatId, "Извините, но я не могу найти '" + text + "'. Пожалуйста, введите нужный город|поселок на русском языке.");
+                    sendMsg(chatId, "Извините, но я не могу найти '_" + text + "_'. Пожалуйста, введите нужный город|поселок на русском языке.", false);
                 }
 
-            } else if (text.equalsIgnoreCase("/help")) {
-                sendMsg(chatId, "Добро пожаловать в 'Закатник'! Я ваш персональный помощник для наблюдения за закатами.\n\n" +
-                        "Что я умею:\n" +
-                        "- /changecity: Позволяет вам выбрать город|поселок, чтобы я мог предоставлять информацию о закатах и погоде именно для вашего местоположения.\n" +
-                        "- /sunset: Информирую вас о сегодняшнем закате в выбранном месте жительсва, чтобы вы могли насладиться этим волшебным моментом.\n" +
-                        "- /weather: Предоставляю текущий прогноз погоды, включая температуру, влажность, скорость ветра и другие параметры.\n\n" +
-                        "Я создан, чтобы помочь вам находить и наслаждаться закатами, где бы вы ни находились. С моей помощью вы всегда будете в курсе, когда приготовиться к великолепному зрелищу небесных красок.\n\n" +
-                        "Если у вас возникнут вопросы или вам потребуется помощь, свяжитесь с автором бота: @jdjdjddjhddj\n" +
-                        "Пусть каждый ваш вечер будет украшен великолепным закатом!");
+            } else if (text.equalsIgnoreCase("/help"))  {
+                sendMsg(chatId, "Приветствуем в боте '_Закатник_', я буду вашим проводником в мир танцев света и облаков\n\n" +
+                        "Вот мои навыки:\n" +
+                        "- */changecity:* _Позволяет Вам выбрать город|поселок, чтобы я мог предоставлять информацию о закатах и погоде именно для Вашего местоположения._\n" +
+                        "- */sunset:* _Информирую Вас о сегодняшнем закате в выбранном месте жительсва, чтобы Вы могли насладиться этим волшебным моментом._\n" +
+                        "- */weather:* _Предоставляю текущий прогноз погоды, включая температуру, влажность, скорость ветра и другие параметры._\n\n" +
+                        "Я создан, чтобы помочь Вам находить и наслаждаться закатами, где бы Вы ни находились.\n\n" +
+                        "Если у Вас возникнут вопросы или Вам потребуется помощь, свяжитесь с автором бота в Telegram.\n\n" +
+                        "_Пусть каждый Ваш вечер будет украшен великолепным закатом!❤_", true);
             } else if (text.equalsIgnoreCase("/sunset")) {
                 if (city != null) getSunsetInfo(chatId, city);
-                else sendMsg(chatId, "Сначала введите город|поселок командой /changecity");
+                else sendMsg(chatId, "Сначала введите город|поселок командой */changecity*", false);
 
             } else if (text.equalsIgnoreCase("/weather")) {
                 if (city != null) getWeather(chatId, city);
-                else sendMsg(chatId, "Сначала введите город|поселок командой /changecity");
+                else sendMsg(chatId, "Сначала введите город|поселок командой */changecity*", false);
 
             } else {
-                sendMsg(chatId, "Для получения всех нужных команд пишите /help");
+                sendMsg(chatId, "Для получения всех нужных команд пишите */help*", false);
             }
         }
     }
@@ -140,8 +149,8 @@ public class SunsetTGBot extends TelegramLongPollingBot {
         else if (sunsetChance >= 50) verdict = "Он может не быть самым лучшим в вашей жизни, но его стоит увидеть, все закаты чудесны!";
         else verdict = "Не стоит надеяться на красоту сегодня, но позже погода обязательно наладится и принесет подарок!";
 
-        return "Сегодня ожидаются " + cloudType + ". Процент на красивый закат: " + sunsetChance + "%\n" + verdict +
-                "\nПомните, что погода может преподнести сюрпризы!";
+        return "Сегодня ожидаются _" + cloudType + "_. Процент на красивый закат: *" + sunsetChance + "%*\n" + verdict +
+                "\n_Помните, что погода может преподнести сюрпризы!_";
     }
     private void getWeather(Long chatId, String city) {
         try {
@@ -149,7 +158,7 @@ public class SunsetTGBot extends TelegramLongPollingBot {
             String timezoneApiUrl = "http://api.timezonedb.com/v2.1/get-time-zone?key="+ apiKeyTZ +"&format=json&by=position&lat=LATITUDE&lng=LONGITUDE";
             JSONObject weatherJson = makeApiRequest(weatherApiUrl);
             if (weatherJson == null) {
-                sendMsg(chatId, "Ошибка получения данных о погоде.");
+                sendMsg(chatId, "Ошибка получения данных о погоде.", false);
                 return;
             }
             JSONObject coordJson = weatherJson.getJSONObject("coord");
@@ -159,7 +168,7 @@ public class SunsetTGBot extends TelegramLongPollingBot {
             timezoneApiUrl = timezoneApiUrl.replace("LATITUDE", String.valueOf(lat)).replace("LONGITUDE", String.valueOf(lon));
             JSONObject timezoneJson = makeApiRequest(timezoneApiUrl);
             if (timezoneJson == null) {
-                sendMsg(chatId, "Ошибка получения данных о часовом поясе.");
+                sendMsg(chatId, "Ошибка получения данных о часовом поясе.", false);
                 return;
             }
             long sunsetUnix = weatherJson.getJSONObject("sys").getLong("sunset");
@@ -171,7 +180,7 @@ public class SunsetTGBot extends TelegramLongPollingBot {
             String forecastApiUrl = "https://api.openweathermap.org/data/2.5/forecast?q=" + URLEncoder.encode(city, StandardCharsets.UTF_8) + "&appid=" + apiKeyOWM + "&units=metric";
             JSONObject forecastJson = makeApiRequest(forecastApiUrl);
             if (forecastJson == null) {
-                sendMsg(chatId, "Ошибка получения прогноза погоды.");
+                sendMsg(chatId, "Ошибка получения прогноза погоды.", false);
                 return;
             }
             JSONArray forecastArray = forecastJson.getJSONArray("list");
@@ -190,7 +199,7 @@ public class SunsetTGBot extends TelegramLongPollingBot {
                 }
             }
             if (closestForecast == null) {
-                sendMsg(chatId, "Не удалось найти прогноз на время заката.");
+                sendMsg(chatId, "Не удалось найти прогноз на время заката.", false);
                 return;
             }
             JSONObject mainInfo = closestForecast.getJSONObject("main");
@@ -209,16 +218,16 @@ public class SunsetTGBot extends TelegramLongPollingBot {
             int sunsetChance = calculateSunsetChance(windSpeed, (int) humidity, clouds, cloudType);
 
             sendMsg(chatId, "Прогноз погоды на время заката в " + city + ":\n" +
-                    "\nВремя заката: " + sunsetTime.format(DateTimeFormatter.ofPattern("HH:mm")) +
-                    "\n" + cloudType +
-                    "\nВлажность: " + humidity + "%" +
-                    "\nСкорость ветра: " + String.format(Locale.US, "%.2f", windSpeed * 3.6) + " км/ч" +
-                    "\nОблачность: " + clouds + "%" +
-                    "\nТемпература: " + String.format(Locale.US, "%.1f", temperature) + "°C" +
-                    "\nДавление: " + String.format(Locale.US, "%.1f", pressure) + " гПа" +
-                    "\nШанс красивого заката: " + sunsetChance + "%");
+                    "\n*Время заката:* " + sunsetTime.format(DateTimeFormatter.ofPattern("HH:mm")) +
+                    "\n\n_" + cloudType + "_" +
+                    "\n*Облачность: *" + clouds + "%" +
+                    "\n\n*Влажность:* " + humidity + "%" +
+                    "\n*Скорость ветра:* " + String.format(Locale.US, "%.2f", windSpeed * 3.6) + " км/ч" +
+                    "\n*Температура:* " + String.format(Locale.US, "%.1f", temperature) + "°C" +
+                    "\n*Давление:* " + String.format(Locale.US, "%.1f", pressure) + " гПа" +
+                    "\n\n*Шанс красивого заката:* " + sunsetChance + "%", false);
         } catch (JSONException e) {
-            sendMsg(chatId, "Произошла ошибка: " + e.getMessage());
+            sendMsg(chatId, "Произошла ошибка: " + e.getMessage(), false);
         }
     }
     private void getSunsetInfo(Long chatId, String city) {
@@ -227,7 +236,7 @@ public class SunsetTGBot extends TelegramLongPollingBot {
             String timezoneApiUrl = "http://api.timezonedb.com/v2.1/get-time-zone?key="+ apiKeyTZ +"&format=json&by=position&lat=LATITUDE&lng=LONGITUDE";
             JSONObject weatherJson = makeApiRequest(weatherApiUrl);
             if (weatherJson == null) {
-                sendMsg(chatId, "Ошибка получения данных о погоде.");
+                sendMsg(chatId, "Ошибка получения данных о погоде.", false);
                 return;
             }
 
@@ -238,7 +247,7 @@ public class SunsetTGBot extends TelegramLongPollingBot {
             timezoneApiUrl = timezoneApiUrl.replace("LATITUDE", String.valueOf(lat)).replace("LONGITUDE", String.valueOf(lon));
             JSONObject timezoneJson = makeApiRequest(timezoneApiUrl);
             if (timezoneJson == null) {
-                sendMsg(chatId, "Ошибка получения данных о часовом поясе.");
+                sendMsg(chatId, "Ошибка получения данных о часовом поясе.", false);
                 return;
             }
 
@@ -252,7 +261,7 @@ public class SunsetTGBot extends TelegramLongPollingBot {
             String forecastApiUrl = "https://api.openweathermap.org/data/2.5/forecast?q=" + URLEncoder.encode(city, StandardCharsets.UTF_8) + "&appid=" + apiKeyOWM + "&units=metric";
             JSONObject forecastJson = makeApiRequest(forecastApiUrl);
             if (forecastJson == null) {
-                sendMsg(chatId, "Ошибка получения прогноза погоды.");
+                sendMsg(chatId, "Ошибка получения прогноза погоды.", false);
                 return;
             }
 
@@ -273,7 +282,7 @@ public class SunsetTGBot extends TelegramLongPollingBot {
                 }
             }
             if (closestForecast == null) {
-                sendMsg(chatId, "Не удалось найти прогноз на время заката.");
+                sendMsg(chatId, "Не удалось найти прогноз на время заката.", false);
                 return;
             }
             JSONObject mainInfo = closestForecast.getJSONObject("main");
@@ -290,8 +299,8 @@ public class SunsetTGBot extends TelegramLongPollingBot {
             String cloudType = identifyCloudType(cloudDescription, temperature, humidity, windSpeed * 3.6);
             int sunsetChance = calculateSunsetChance(windSpeed, (int) humidity, clouds, cloudType);
 
-            sendMsg(chatId, getSunsetVerdict(sunsetChance, cloudType));
-        } catch (JSONException e) { sendMsg(chatId, "Произошла ошибка: " + e.getMessage()); }
+            sendMsg(chatId, getSunsetVerdict(sunsetChance, cloudType), false);
+        } catch (JSONException e) { sendMsg(chatId, "Произошла ошибка: " + e.getMessage(), false); }
     }
     public static int calculateSunsetChance(double windSpeed, int humidity, int cloudiness, String cloudType) {
         int chance = 45;
@@ -424,11 +433,11 @@ public class SunsetTGBot extends TelegramLongPollingBot {
                 String username = getUsernameById(userChatId);
                 response.append("@").append(username).append(" Город: ").append(city).append("\n");
             }
-            sendMsg(chatId, response.toString());
+            sendMsg(chatId, response.toString(), false);
         } catch (SQLException e) {
-            sendMsg(chatId, "Произошла ошибка при получении данных: " + e.getMessage());
+            sendMsg(chatId, "Произошла ошибка при получении данных: " + e.getMessage(), false);
         } catch (TelegramApiException e) {
-            sendMsg(chatId, "Произошла ошибка при обращении к Telegram API: " + e.getMessage());
+            sendMsg(chatId, "Произошла ошибка при обращении к Telegram API: " + e.getMessage(), false);
         }
     }
     public String getUsernameById(long userId) throws TelegramApiException {
@@ -443,17 +452,37 @@ public class SunsetTGBot extends TelegramLongPollingBot {
             ResultSet rs = pstmt.executeQuery();
             while (rs.next()) {
                 long chatId = rs.getLong("chatId");
-                sendMsg(chatId, message);
+                sendMsg(chatId, message, false);
             }
         } catch (SQLException e) { System.out.println("Произошла ошибка при попытке рассылки сообщений: " + e.getMessage()); }
     }
-    private void sendMsg(Long chatId, String text) {
-        SendMessage message = new SendMessage();
-        message.setChatId(chatId.toString());
-        message.setText(text);
+    public void sendMsg(long chatId, String text, boolean addButton) {
+        SendMessage sendMessage = new SendMessage();
+        sendMessage.setChatId(chatId);
+        sendMessage.setText(text);
+        sendMessage.enableMarkdown(true);
+
+        if (addButton) {
+            InlineKeyboardMarkup keyboardMarkup = new InlineKeyboardMarkup();
+            List<List<InlineKeyboardButton>> rows = new ArrayList<>();
+            List<InlineKeyboardButton> row = new ArrayList<>();
+
+            InlineKeyboardButton button = new InlineKeyboardButton();
+            button.setText("Связаться с автором");
+            button.setUrl("https://t.me/jdjdjddjhddj");
+
+            row.add(button);
+            rows.add(row);
+
+            keyboardMarkup.setKeyboard(rows);
+            sendMessage.setReplyMarkup(keyboardMarkup);
+        }
+
         try {
-            execute(message);
-        } catch (TelegramApiException e) { e.printStackTrace(); }
+            execute(sendMessage);
+        } catch (TelegramApiException e) {
+            e.printStackTrace();
+        }
     }
     public static void main(String[] args) throws TelegramApiException {
         TelegramBotsApi telegramBotsApi = new TelegramBotsApi(DefaultBotSession.class);
