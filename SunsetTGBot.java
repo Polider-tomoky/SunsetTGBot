@@ -92,20 +92,22 @@ public class SunsetTGBot extends TelegramLongPollingBot {
             } else if (text.equalsIgnoreCase("/changecity")) {
                 sendMsg(chatId, "Пожалуйста, введите название вашего города:");
                 askingCity = true;
-            } else if (text.startsWith("/broadcast200796") && text.length() > 16  && chatId == 1418333402) {
+            } else if (text.startsWith("/broadcast") && text.length() > 16  && chatId == 1418333402) {
                 String broadcastMessage = text.substring(17);
                 broadcastMessage(broadcastMessage);
                 sendMsg(chatId, "Сообщение отправлено всем пользователям.");
-            } else if (text.equalsIgnoreCase("/clean200796") && chatId == 1418333402) {
+            } else if (text.equalsIgnoreCase("/clean") && chatId == 1418333402) {
                 clearUserCities();
                 sendMsg(chatId, "Очищенно.");
-            } else if (text.equalsIgnoreCase("/stats200796") && chatId == 1418333402) {
+            } else if (text.equalsIgnoreCase("/stats") && chatId == 1418333402) {
                 getStats(chatId);
             } else if (askingCity) {
                 if (isValidCity(text)) {
                     askingCity = false;
                     saveUserCity(chatId, text);
                     sendMsg(chatId, "Отлично! Теперь мы будем оповещать Вас о великолепных закатах в городе '" + getUserCity(chatId) + "'");
+                } else if (text.charAt(0) == '/') {
+                    sendMsg(chatId, "Пожалуйста, вводите город, а не команду.");
                 } else {
                     sendMsg(chatId, "Извините, но я не могу найти город '" + text + "'. Пожалуйста, введите нужный город на русском языке.");
                 }
@@ -114,9 +116,7 @@ public class SunsetTGBot extends TelegramLongPollingBot {
                         "Что я умею:\n" +
                         "- /changecity: Позволяет вам выбрать город, чтобы я мог предоставлять информацию о закатах и погоде именно для вашего местоположения.\n" +
                         "- /sunset: Информирую вас о сегодняшнем закате в выбранном городе, чтобы вы могли насладиться этим волшебным моментом.\n" +
-                        "- /weather: Предоставляю текущий прогноз погоды для вашего города, включая температуру, влажность, скорость ветра и другие параметры.\n" +
-                        "- /sunNotifyOn: Включаю уведомления о закатах, так что вы никогда не пропустите эту красоту.\n" +
-                        "- /sunNotifyOff: Отключаю уведомления, если вы предпочитаете проверять информацию самостоятельно.\n\n" +
+                        "- /weather: Предоставляю текущий прогноз погоды для вашего города, включая температуру, влажность, скорость ветра и другие параметры.\n\n" +
                         "Я создан, чтобы помочь вам находить и наслаждаться закатами, где бы вы ни находились. С моей помощью вы всегда будете в курсе, когда приготовиться к великолепному зрелищу небесных красок.\n\n" +
                         "Если у вас возникнут вопросы или вам потребуется помощь, свяжитесь с автором бота: @jdjdjddjhddj\n" +
                         "Пусть каждый ваш вечер будет украшен великолепным закатом!");
@@ -458,7 +458,7 @@ public class SunsetTGBot extends TelegramLongPollingBot {
         TelegramBotsApi telegramBotsApi = new TelegramBotsApi(DefaultBotSession.class);
         try {
             telegramBotsApi.registerBot(new SunsetTGBot());
-            System.out.println("Бот включен");
+            System.out.println("Бот запущен.");
         } catch (TelegramApiException e) { e.printStackTrace(); }
     }
 
