@@ -547,7 +547,7 @@ public class SunsetTGBot extends TelegramLongPollingBot {
                 long userChatId = rs.getLong("chatId");
                 String city = rs.getString("city");
                 String username = getUsernameById(userChatId);
-                response.append("@").append(username).append(" Город: ").append(city).append("\n");
+                response.append("@").append(username).append(" ").append(city).append("\n");
             }
             sendMsg(chatId, response.toString(), false, false);
         } catch (SQLException e) {
