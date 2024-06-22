@@ -113,8 +113,8 @@ public class SunsetTGBot extends TelegramLongPollingBot {
                         "- */changecity:* _Позволяет Вам выбрать город|поселок, чтобы я мог предоставлять информацию о закатах и погоде именно для Вашего местоположения._\n" +
                         "- */sunset:* _Информирую Вас о сегодняшнем закате в выбранном месте жительсва, чтобы Вы могли насладиться этим волшебным моментом._\n" +
                         "- */weather:* _Предоставляю текущий прогноз погоды, включая температуру, влажность, скорость ветра и другие параметры._\n" +
-                        "- /notifyOn: _Включаю уведомления о закатах, так что вы никогда не пропустите эту красоту._\n" +
-                        "- /notifyOff: _Отключаю уведомления, если вы предпочитаете проверять информацию самостоятельно._\n\n" +
+                        "- */notifyOn:* _Включаю уведомления о закатах, так что вы никогда не пропустите эту красоту._\n" +
+                        "- */notifyOff:* _Отключаю уведомления, если вы предпочитаете проверять информацию самостоятельно._\n\n" +
                         "Я создан, чтобы помочь Вам находить и наслаждаться закатами, где бы Вы ни находились.\n\n" +
                         "Если у Вас возникнут вопросы или Вам потребуется помощь, свяжитесь с автором бота в Telegram.\n\n" +
                         "_Пусть каждый Ваш вечер будет украшен великолепным закатом!❤_", true, true);
@@ -466,7 +466,7 @@ public class SunsetTGBot extends TelegramLongPollingBot {
                 }
             }
         };
-        long delayUntil16 = computeDelayUntil(1, 15);
+        long delayUntil16 = computeDelayUntil(16, 0);
         long delayUntil1930 = computeDelayUntil(19, 30);
         scheduler.scheduleAtFixedRate(weatherNotifier, delayUntil16, TimeUnit.DAYS.toMillis(1), TimeUnit.MILLISECONDS);
         scheduler.scheduleAtFixedRate(weatherNotifier, delayUntil1930, TimeUnit.DAYS.toMillis(1), TimeUnit.MILLISECONDS);
